@@ -1,6 +1,6 @@
 import '../css/style.scss';
-import MakeElement from './Tools/MakeElement.js';
-
+import MakeElement from './Tools/MakeElement';
+import BaseLevel from './Component/Base';
 
 
 
@@ -13,10 +13,17 @@ function RenderSite(){
   let makeEle = new MakeElement;
 
   let bodyContainer = makeEle.createEle('div','bodyContainer',[12,12,12,12],'bodyContain');  
-      bodyContainer.innerHTML = `<div> Hey, Welcome to PureJS </div>`;
+  let Base = new BaseLevel; 
+  bodyContainer.append(Base.renderDiv());
 
   
   body.append(bodyContainer);
 }
 
-RenderSite(); 
+
+
+if (document.readyState == 'loading') {
+    document.addEventListener('DOMContentLoaded', RenderSite);
+} else {
+    RenderSite();
+}

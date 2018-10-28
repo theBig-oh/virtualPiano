@@ -1,0 +1,32 @@
+
+
+.baseContain {
+  border: 1px solid black;
+  height: 100%;
+
+
+  .key_container {
+    border: 1px solid green;
+    height: 50%;
+    display: flex;
+    flex-wrap: no-wrap;
+    flex-direction: row;
+    .display_key {
+      background: white;
+      border: 1px solid black;
+      height: 40%;
+
+      &.white_key {
+        background: white;
+        border: 2px solid black;
+        height: 60%;
+      }
+      &.black_key {
+        background: black;
+        border: 2px solid white;
+        color: white;
+      }
+    }
+  }
+
+}
