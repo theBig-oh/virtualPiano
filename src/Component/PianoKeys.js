@@ -72,7 +72,7 @@ function lowerOctave(tone){
 
 export default class PianoKeys {
   constructor() {
-    this.numberOfKeys = 24;
+    this.numberOfKeys = 48;
 
   }
 
@@ -87,22 +87,42 @@ export default class PianoKeys {
       let tone = new MakeSound(context);
       let shifted = event.shiftKey ? true : false;
       let now = context.currentTime;
+      let noteKeys = document.querySelectorAll('.display_key');
+
       notes.forEach((note,i) => {
-        switch(event.keyCode) {
-          case note.kCode[0]:
 
-            if(shifted) {
-              tone.play(lowerOctave(note.tone), now);
-            }
-            tone.play(note.tone, now);
-            break;
-          case note.kCode[1]: 
+        for(let x=0; x<noteKeys.length;x++) {
+          let keyTouch = noteKeys[x];
+          let actualKey = i + 1;
+           switch(event.keyCode) {
+            case note.kCode[0]:
 
-            if(shifted) {
-              tone.play(raiseOctave(note.tone), now);
-            }
-            tone.play(note.tone, now);
-            
+              if(shifted) {
+                tone.play(lowerOctave(note.tone), now);
+                keyTouch.classList.remove('active_key');
+                noteKeys[actualKey-1].classList.add('active_key');
+              } else {
+                tone.play(note.tone, now);
+                keyTouch.classList.remove('active_key');
+                noteKeys[actualKey+11].classList.add('active_key');
+              }
+              
+              break;
+            case note.kCode[1]: 
+
+              if(shifted) {
+                tone.play(raiseOctave(raiseOctave(note.tone)), now);
+                keyTouch.classList.remove('active_key');
+                noteKeys[actualKey+35].classList.add('active_key');
+              } else {
+                tone.play(raiseOctave(note.tone), now);
+                keyTouch.classList.remove('active_key');
+                noteKeys[actualKey+23].classList.add('active_key');
+                console.log(note.rootNote);
+                console.log(actualKey+22);
+              }
+              
+          }
         }
       });
     }
@@ -112,7 +132,7 @@ export default class PianoKeys {
   renderDiv() {
     let makeEle = new MakeElement;
     let key_container = makeEle.createEle('div','key_container',[12,12,12,12],'key_container');
-    let keyAmount = Array(24).fill(null);
+    let keyAmount = Array(this.numberOfKeys).fill(null); // Need to find the right amount for the right "flow" 
 
     let keys = keyAmount.map((key,i) => {
       let octaveNum = i%12; // returns from 0 - 11, easier to identify sharps/flats
@@ -123,7 +143,7 @@ export default class PianoKeys {
         whiteOrBlackKey = 'black_key';   
       }
      
-      let displayKey = makeEle.createEle('div','key_'+i,[1,1,1,1],['display_key',whiteOrBlackKey]);
+      let displayKey = makeEle.createEle('div','key_'+i,null,['display_key',whiteOrBlackKey]);
       displayKey.innerHTML = `<div class='keyNote'>${notes[octaveNum].rootNote}</div>`;
       
 
@@ -145,6 +165,7 @@ export default class PianoKeys {
 
 
     this.soundOff();
+    
 
     return key_container;
   }

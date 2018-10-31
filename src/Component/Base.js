@@ -45,6 +45,7 @@ export default class BaseLevel {
 
   
     baseDiv.appendChild(pianoKeys.renderDiv());
+    pianoKeys.soundOff();
 
     return baseDiv  
   }

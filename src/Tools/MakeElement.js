@@ -68,14 +68,18 @@ class MakeElement {
       classStuff.push(custom);
     }
     
-    gridsize.forEach(function(siz,i){
-      let multiSize = ['xs','sm','md','lg'];
-      if(parseInt(siz) == 0) {
-        classStuff.push(`hidden-${multiSize[i]}`);
-      } else {
-        classStuff.push(`col-${multiSize[i]}-${siz}`);
-      }
-    })
+    if(gridsize) {
+      gridsize.forEach(function(siz,i){
+        let multiSize = ['xs','sm','md','lg'];
+        if(parseInt(siz) == 0) {
+          classStuff.push(`hidden-${multiSize[i]}`);
+        } else {
+          classStuff.push(`col-${multiSize[i]}-${siz}`);
+        }
+      })
+    } else {
+      console.log('bootstrap not used');
+    }
 
     classStuff.forEach(function(clas){
       newElement.classList.add(clas);
