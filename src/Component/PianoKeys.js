@@ -1,5 +1,21 @@
 import MakeElement from '../Tools/MakeElement';
 // Needs to be made into its own seperate component. 
+/*
+    A very basic sound generator using javascript Audio API. 
+
+
+    - Need to add a way to sustain notes
+    - Add natural decay
+    - Add modulation 
+    - Add Volume control. 
+    - Different channels for clearer notes
+
+
+    Not much out there in terms of help, so it's gonna be a new frontier. 
+
+
+*/
+
 class MakeSound {
   constructor(context){
     this.context = context;
@@ -28,6 +44,29 @@ class MakeSound {
   }
 }
 
+
+/*
+
+  KeyCodes---- 
+
+    How the user plays it using the keyboard.
+
+    `keycodes` & `octKeycodes` represent the range of a standard keyboard starting at middle C. 
+
+    `Z` is middle C. (Not going to say C3 or C4 cause that's confusing for both musicans and developers... Google it to find out more)
+
+    `Y` is C raised 1 full octave.
+
+    `Shift` + `Z` is C lowered by 1 full octave
+
+    `Shift` + `Y` is C raised by 2 octaves.
+
+
+
+    This effectively gives you a range of 4 full octaves.
+
+
+*/
 
 //              z  s  x  d  c  v  g  b  h   n  j
 const keycodes = [90,83,88,68,67,86,71,66,72,78,74,77];
@@ -68,6 +107,12 @@ function raiseOctave(tone){
 function lowerOctave(tone){    
     return tone / 2;
 }
+
+function playChord(chordType,noteType){
+
+}
+
+
 
 
 export default class PianoKeys {
@@ -131,6 +176,10 @@ export default class PianoKeys {
 
   renderDiv() {
     let makeEle = new MakeElement;
+    let pianoContainer = makeEle.createEle('div','piano_container',[12,12,12,12],['baseContent','pianoContainer']);
+
+    let keyboardDisplay = makeEle.createEle('div','keyboard_display', [12,12,12,12],'keyboardDisplay');
+
     let key_container = makeEle.createEle('div','key_container',[12,12,12,12],'key_container');
     let keyAmount = Array(this.numberOfKeys).fill(null); // Need to find the right amount for the right "flow" 
 
@@ -164,10 +213,11 @@ export default class PianoKeys {
     });    
 
 
-    this.soundOff();
+
+    pianoContainer.append(keyboardDisplay, key_container);
     
 
-    return key_container;
+    return pianoContainer;
   }
 
 }
