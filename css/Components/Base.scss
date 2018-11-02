@@ -9,9 +9,38 @@
     border: 1px solid green;
     height: 50%;
     display: flex;
-    flex-wrap: no-wrap;
+    flex-wrap: wrap;
     flex-direction: row;
-    .display_key {
+
+    .pianoKeysContainer {
+      border: 1px solid black;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: no-wrap;
+       .display_key {
+        background: white;
+        border: 1px solid black;
+        height: 40%;
+        width: 3%;
+
+        &.white_key {
+          background: white;
+          border: 2px solid black;
+          height: 60%;
+
+        }
+        &.black_key {
+          background: black;
+          border: 2px solid white;
+          color: white;
+        }
+        &.active_key {
+          background:  red;
+        }
+      } 
+    }
+
+/*     .display_key {
       background: white;
       border: 1px solid black;
       height: 40%;
@@ -31,7 +60,7 @@
       &.active_key {
         background:  red;
       }
-    }
+    } */
   }
 
 }

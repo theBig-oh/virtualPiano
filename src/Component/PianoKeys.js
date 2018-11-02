@@ -1,49 +1,6 @@
 import MakeElement from '../Tools/MakeElement';
+import MakeSound from '../Tools/MakeSound';
 // Needs to be made into its own seperate component. 
-/*
-    A very basic sound generator using javascript Audio API. 
-
-
-    - Need to add a way to sustain notes
-    - Add natural decay
-    - Add modulation 
-    - Add Volume control. 
-    - Different channels for clearer notes
-
-
-    Not much out there in terms of help, so it's gonna be a new frontier. 
-
-
-*/
-
-class MakeSound {
-  constructor(context){
-    this.context = context;
-  }
-  init(){
-    this.oscillator = this.context.createOscillator();
-    this.gainNode = this.context.createGain();
-
-    this.oscillator.connect(this.gainNode);
-    this.gainNode.connect(this.context.destination);
-
-  }
-  play(value,time,type){
-    this.init();
-
-    this.oscillator.frequency.value = value;
-    this.type = type ? 'sine' : type;
-    this.gainNode.gain.setValueAtTime(1, this.context.currentTime);
-
-    this.oscillator.start(time);
-    this.stop(time);
-  }
-  stop(time){
-    this.gainNode.gain.exponentialRampToValueAtTime(0.001, time+1);
-    this.oscillator.stop(time +1);
-  }
-}
-
 
 /*
 
@@ -66,6 +23,8 @@ class MakeSound {
     This effectively gives you a range of 4 full octaves.
 
 
+    Gonna have to test out some configurations for laptop support, and see if I can check keyboard keycount beforehand.
+
 */
 
 //              z  s  x  d  c  v  g  b  h   n  j
@@ -74,6 +33,35 @@ const keycodes = [90,83,88,68,67,86,71,66,72,78,74,77];
 //                
 const octKeycode = [89,55,85,56,73,79,48,80,173,219,61,221];
 //                y   7 u   8  i  o 0   p  -   [   =  ]
+
+const auxKeycode = {
+                    "numPad":[
+                              96, //  0
+                              97, //  1
+                              98, //  2
+                              99, //  3
+                              100, // 4
+                              101, // 5
+                              102, // 6
+                              103, // 7
+                              104, // 8
+                              105, // 9
+                              110, // .
+                              107, // +
+                              109, // -
+                              106, // *
+                              111, // /
+                            ],
+                    "fullKeyInserGroup": [
+                                          45, //  Insert
+                                          46, //  Delete
+                                          36, //  Home
+                                          35, //  End
+                                          33, //  Page Up / PgUp
+                                          34, //  Page Down / PgDwn
+                                        ]
+                  };
+
 
 // Set at Middle C.
 const notes = [     {'tone':261,'rootNote':'c','kCode':[keycodes[0],octKeycode[0]]},  // 0
@@ -108,10 +96,6 @@ function lowerOctave(tone){
     return tone / 2;
 }
 
-function playChord(chordType,noteType){
-
-}
-
 
 
 
@@ -127,10 +111,13 @@ export default class PianoKeys {
     body.onkeydown = (event) => {
       if(!event.metakey) {
         event.preventDefault();
-      }
+      } 
+
+
       let context = new(window.AudioContext || window.webkitAudioContext)();
       let tone = new MakeSound(context);
       let shifted = event.shiftKey ? true : false;
+      let repeated = event.repeat ? true : false;
       let now = context.currentTime;
       let noteKeys = document.querySelectorAll('.display_key');
 
@@ -143,28 +130,30 @@ export default class PianoKeys {
             case note.kCode[0]:
 
               if(shifted) {
-                tone.play(lowerOctave(note.tone), now);
+                tone.play(lowerOctave(note.tone), now + 0.25);
                 keyTouch.classList.remove('active_key');
-                noteKeys[actualKey-1].classList.add('active_key');
+                /*noteKeys[actualKey-1].classList.add('active_key');*/
+                document.querySelector('#key_'+(actualKey-1)).classList.add('active_key');
               } else {
-                tone.play(note.tone, now);
+                tone.play(note.tone, now + 0.25);
                 keyTouch.classList.remove('active_key');
-                noteKeys[actualKey+11].classList.add('active_key');
+         /*       noteKeys[actualKey+11].classList.add('active_key');*/
+                 document.querySelector('#key_'+(actualKey+11)).classList.add('active_key');
               }
               
               break;
             case note.kCode[1]: 
 
               if(shifted) {
-                tone.play(raiseOctave(raiseOctave(note.tone)), now);
+                tone.play(raiseOctave(raiseOctave(note.tone)), now + 0.25);
                 keyTouch.classList.remove('active_key');
-                noteKeys[actualKey+35].classList.add('active_key');
+/*                noteKeys[actualKey+35].classList.add('active_key');*/
+                 document.querySelector('#key_'+(actualKey+35)).classList.add('active_key');
               } else {
-                tone.play(raiseOctave(note.tone), now);
+                tone.play(raiseOctave(note.tone), now + 0.25);
                 keyTouch.classList.remove('active_key');
-                noteKeys[actualKey+23].classList.add('active_key');
-                console.log(note.rootNote);
-                console.log(actualKey+22);
+/*                noteKeys[actualKey+23].classList.add('active_key');*/
+                 document.querySelector('#key_'+(actualKey+23)).classList.add('active_key');
               }
               
           }
@@ -172,46 +161,113 @@ export default class PianoKeys {
       });
     }
   }
+/*soundOff(noted) {
+
+  const body = document.querySelector('body');
+  let context = new(window.AudioContext || window.webkitAudioContext)();
+  let tone = null;
+  let now = null;
+  let isPressed = false;
+  body.addEventListener('keydown', (event) => {
+    if(!event.metakey) {
+      event.preventDefault();
+    } 
 
 
+     tone = new MakeSound(context);
+    let shifted = event.shiftKey ? true : false;
+    now = context.currentTime;
+    let noteKeys = document.querySelectorAll('.display_key');
+    if(event.repeat) {
+      now = context.currentTime;
+    }
+
+    notes.forEach((note,i) => {
+      console.log(note);
+      for(let x=0; x<noteKeys.length;x++) {
+        let keyTouch = noteKeys[x];
+        let actualKey = i + 1;
+
+        switch(event.keyCode) {
+          case note.kCode[0]: 
+            if(shifted) {
+              tone.play(lowerOctave(note.tone), now);
+              tone.stop(now);
+              keyTouch.classList.remove('active_key');
+            } else {
+                tone.play(note.tone, now);
+                tone.stop(now);
+                keyTouch.classList.remove('active_key');
+                noteKeys[actualKey+11].classList.add('active_key');
+            } 
+            break;
+          case note.kCode[1]: 
+            if(shifted) {
+              tone.play(raiseOctave(raiseOctave(note.tone)), now);
+              tone.stop(now);
+              keyTouch.classList.remove('active_key');
+              noteKeys[actualKey+35].classList.add('active_key');
+            } else {
+              tone.play(raiseOctave(note.tone), now);
+              tone.stop(now);
+              keyTouch.classList.remove('active_key');
+              noteKeys[actualKey+23].classList.add('active_key');
+            }
+            break;            
+         }
+
+      }
+    })
+
+  })
+
+} */
   renderDiv() {
     let makeEle = new MakeElement;
     let pianoContainer = makeEle.createEle('div','piano_container',[12,12,12,12],['baseContent','pianoContainer']);
 
     let keyboardDisplay = makeEle.createEle('div','keyboard_display', [12,12,12,12],'keyboardDisplay');
 
-    let key_container = makeEle.createEle('div','key_container',[12,12,12,12],'key_container');
     let keyAmount = Array(this.numberOfKeys).fill(null); // Need to find the right amount for the right "flow" 
+    let key_container = makeEle.createEle('div','key_container',[12,12,12,12],'key_container');
+    let whiteKeyContainer = makeEle.createEle('div','white_key_container',[12,12,12,12],['whiteKeyContainer','pianoKeysContainer']);
+    let blackKeyContainer = makeEle.createEle('div','black_key_container',[12,12,12,12],['blackKeyContainer','pianoKeysContainer']);
 
     let keys = keyAmount.map((key,i) => {
       let octaveNum = i%12; // returns from 0 - 11, easier to identify sharps/flats
       let blackKeys = [1,3,6,8,10];
       let whiteOrBlackKey = 'white_key';
+      let whichKey = 'whiteKeyContainer';
      
       if(blackKeys.includes(octaveNum)) {
-        whiteOrBlackKey = 'black_key';   
+        whiteOrBlackKey = 'black_key';
+        whichKey = 'blackKeyContainer';
       }
      
       let displayKey = makeEle.createEle('div','key_'+i,null,['display_key',whiteOrBlackKey]);
       displayKey.innerHTML = `<div class='keyNote'>${notes[octaveNum].rootNote}</div>`;
-      
 
-      key_container.append(displayKey);
+      eval(whichKey).append(displayKey);
+      
 
       displayKey.addEventListener('click', () => {
         let context = new(window.AudioContext || window.webkitAudioContext)();
         let tone = new MakeSound(context);
         let now = context.currentTime;
 
-        if(i > 11) {
+        if(i > 23 && i <= 35) {
           tone.play(raiseOctave(notes[octaveNum].tone), now);
-        } else {
+        } else if (i > 11 && i < 22) {
           tone.play(notes[octaveNum].tone, now);          
+        } else if(i >= 36) {
+          tone.play(raiseOctave(raiseOctave(notes[octaveNum].tone)), now);
+        } else {
+           tone.play(lowerOctave(notes[octaveNum].tone), now);
         }
       })
 
     });    
-
+    key_container.append(whiteKeyContainer, blackKeyContainer);
 
 
     pianoContainer.append(keyboardDisplay, key_container);

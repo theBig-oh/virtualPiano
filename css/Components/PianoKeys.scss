@@ -1,0 +1,115 @@
+
+
+.pianoContainer {
+height: 100%;
+
+  .key_container {
+    border: 1px solid green;
+    height: 50%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    padding: 0; 
+    .pianoKeysContainer {
+      border: 1px solid black;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: no-wrap;
+      padding: 0;
+       .display_key {
+        background: white;
+        border: 1px solid black;
+        padding: 0;
+        display: flex;
+        align-items: flex-end;
+        transition: all 0.2s ease;
+
+        &.white_key {
+          background: white;
+          border: 2px solid black;
+          height: 100%;
+          width: 5%;
+          padding: 0;
+        }
+        &.black_key {
+          background: black;
+          border: 2px solid white;
+          color: white;
+          height: 60%;
+        }
+        &.active_key {
+          background:  red;
+        }
+      }
+
+    }
+    .blackKeyContainer {
+
+      > div {
+        position: relative;
+        top: -101%;
+      }
+      #key_1 {
+        left: 2%;
+      }
+      #key_3 {
+        left: 2.5%;
+      }
+      #key_6 {
+        left: 6.5%;
+      }
+      #key_8 {
+        left: 7%;
+      }
+      #key_10 {
+        left: 8%;
+      }
+      #key_13 {
+        left: 12%;
+      }
+      #key_15 {
+        left: 12.5%;
+      }
+      #key_18 {
+        left: 16.8%;
+      }
+      #key_20 {
+        left: 17.5%;
+      }
+      #key_22 {
+        left: 18%;
+      }
+      #key_25 {
+        left: 22%;
+      }
+      #key_27 {
+        left: 22.5%;
+      }
+      #key_30 {
+        left: 23%;
+      }
+      #key_32 {
+        left: 27.5%;
+      }
+      #key_34 {
+        left: 28%;
+      }
+      #key_37 {
+        left: 32%;
+      }
+      #key_39 {
+        left: 32.5%;
+      }
+      #key_42 {
+        left: 37%;
+      }
+      #key_44 {
+        left: 37.5%;
+      }
+      #key_46 {
+        left: 38%;
+      }                                                                  
+    }
+  }
+
+}
