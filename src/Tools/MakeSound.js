@@ -16,30 +16,36 @@
 
 
 export default class MakeSound {
-  constructor(context) {
+  constructor(context,volum) {
     this.context = context;
-    console.log(context);
-  } 
-  init() {
+    this.volume = volum;
     this.oscillator = this.context.createOscillator();
     this.gainNode = this.context.createGain();
 
+    this.init(); 
+  } 
+  init() {
+
     this.oscillator.connect(this.gainNode);
     this.gainNode.connect(this.context.destination);
+     // Needs to be set in 1^10 values. 1 is max.
   }
   play(value,time,type) {
-    this.init();
+    
+   
 
     this.oscillator.frequency.value = value;
-    this.type = type ? 'square' : type;
-
-    this.gainNode.gain.exponentialRampToValueAtTime(1, this.context.currentTime);
-
+    this.oscillator.type = type ? type : 'square';
+    this.type = type;
+    this.gainNode.gain.value = this.volume;
     this.oscillator.start(time);
-    this.stop(time);
+
+   
   } 
   stop(time) {
-    this.gainNode.gain.exponentialRampToValueAtTime(0.001, time+1.5);
-    this.oscillator.stop(time + 0.5);
+    console.log('this is in stop()'); 
+    this.gainNode.gain.exponentialRampToValueAtTime(0.0001, 3.25);
+    this.oscillator.stop(1.25);
+
   }
 }

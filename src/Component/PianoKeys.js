@@ -102,66 +102,14 @@ function lowerOctave(tone){
 export default class PianoKeys {
   constructor() {
     this.numberOfKeys = 48;
+    this.state = {
+      volume: 0.001,
 
-  }
-
-  soundOff(noted) {
-    const body = document.querySelector('body');
-
-    body.onkeydown = (event) => {
-      if(!event.metakey) {
-        event.preventDefault();
-      } 
-
-
-      let context = new(window.AudioContext || window.webkitAudioContext)();
-      let tone = new MakeSound(context);
-      let shifted = event.shiftKey ? true : false;
-      let repeated = event.repeat ? true : false;
-      let now = context.currentTime;
-      let noteKeys = document.querySelectorAll('.display_key');
-
-      notes.forEach((note,i) => {
-
-        for(let x=0; x<noteKeys.length;x++) {
-          let keyTouch = noteKeys[x];
-          let actualKey = i + 1;
-           switch(event.keyCode) {
-            case note.kCode[0]:
-
-              if(shifted) {
-                tone.play(lowerOctave(note.tone), now + 0.25);
-                keyTouch.classList.remove('active_key');
-                /*noteKeys[actualKey-1].classList.add('active_key');*/
-                document.querySelector('#key_'+(actualKey-1)).classList.add('active_key');
-              } else {
-                tone.play(note.tone, now + 0.25);
-                keyTouch.classList.remove('active_key');
-         /*       noteKeys[actualKey+11].classList.add('active_key');*/
-                 document.querySelector('#key_'+(actualKey+11)).classList.add('active_key');
-              }
-              
-              break;
-            case note.kCode[1]: 
-
-              if(shifted) {
-                tone.play(raiseOctave(raiseOctave(note.tone)), now + 0.25);
-                keyTouch.classList.remove('active_key');
-/*                noteKeys[actualKey+35].classList.add('active_key');*/
-                 document.querySelector('#key_'+(actualKey+35)).classList.add('active_key');
-              } else {
-                tone.play(raiseOctave(note.tone), now + 0.25);
-                keyTouch.classList.remove('active_key');
-/*                noteKeys[actualKey+23].classList.add('active_key');*/
-                 document.querySelector('#key_'+(actualKey+23)).classList.add('active_key');
-              }
-              
-          }
-        }
-      });
     }
+
   }
-/*soundOff(noted) {
+
+soundOn(noted) { // Formely known as soundOff *****
 
   const body = document.querySelector('body');
   let context = new(window.AudioContext || window.webkitAudioContext)();
@@ -173,55 +121,112 @@ export default class PianoKeys {
       event.preventDefault();
     } 
 
+    console.log(event.key);
 
-     tone = new MakeSound(context);
     let shifted = event.shiftKey ? true : false;
     now = context.currentTime;
     let noteKeys = document.querySelectorAll('.display_key');
     if(event.repeat) {
-      now = context.currentTime;
+      return null;
     }
 
-    notes.forEach((note,i) => {
-      console.log(note);
-      for(let x=0; x<noteKeys.length;x++) {
-        let keyTouch = noteKeys[x];
-        let actualKey = i + 1;
+      notes.forEach((note,i) => {
 
-        switch(event.keyCode) {
-          case note.kCode[0]: 
-            if(shifted) {
-              tone.play(lowerOctave(note.tone), now);
-              tone.stop(now);
-              keyTouch.classList.remove('active_key');
-            } else {
-                tone.play(note.tone, now);
-                tone.stop(now);
+        for(let x=0; x<noteKeys.length;x++) {
+          let keyTouch = noteKeys[x];
+          let actualKey = i + 1;
+           switch(event.keyCode) {
+            case note.kCode[0]:
+
+              if(shifted) {
+                document.querySelector('#key_'+(actualKey-1)).virtualKCode = note.kCode[0];
+                document.querySelector('#key_'+(actualKey-1)).toneGen = new MakeSound(context, this.state.volume)
+                document.querySelector('#key_'+(actualKey-1)).toneGen.play(lowerOctave(note.tone), now + 0.25);
                 keyTouch.classList.remove('active_key');
-                noteKeys[actualKey+11].classList.add('active_key');
-            } 
-            break;
-          case note.kCode[1]: 
-            if(shifted) {
-              tone.play(raiseOctave(raiseOctave(note.tone)), now);
-              tone.stop(now);
-              keyTouch.classList.remove('active_key');
-              noteKeys[actualKey+35].classList.add('active_key');
-            } else {
-              tone.play(raiseOctave(note.tone), now);
-              tone.stop(now);
-              keyTouch.classList.remove('active_key');
-              noteKeys[actualKey+23].classList.add('active_key');
-            }
-            break;            
-         }
+                document.querySelector('#key_'+(actualKey-1)).classList.add('active_key');
+              } else {
+                 document.querySelector('#key_'+(actualKey+11)).virtualKCode = note.kCode[0];
+                document.querySelector('#key_'+(actualKey+11)).toneGen = new MakeSound(context, this.state.volume);
+                document.querySelector('#key_'+(actualKey+11)).toneGen.play(note.tone, now + 0.25);
+                keyTouch.classList.remove('active_key');
+                document.querySelector('#key_'+(actualKey+11)).classList.add('active_key');
+              }
+              
+              break;
+            case note.kCode[1]: 
 
-      }
-    })
+              if(shifted) {
+                document.querySelector('#key_'+(actualKey+35)).virtualKCode = note.kCode[1];
+                document.querySelector('#key_'+(actualKey+35)).toneGen = new MakeSound(context, this.state.volume);
+                document.querySelector('#key_'+(actualKey+35)).toneGen.play(raiseOctave(raiseOctave(note.tone)), now + 0.25);
+                keyTouch.classList.remove('active_key');
+                document.querySelector('#key_'+(actualKey+35)).classList.add('active_key');
+              } else {
+                document.querySelector('#key_'+(actualKey+23)).virtualKCode = note.kCode[1];
+                document.querySelector('#key_'+(actualKey+23)).toneGen = new MakeSound(context, this.state.volume);
+                document.querySelector('#key_'+(actualKey+23)).toneGen.play(raiseOctave(note.tone), now + 0.25);
+                keyTouch.classList.remove('active_key');
+                document.querySelector('#key_'+(actualKey+23)).classList.add('active_key');
+              }
+              
+          }
+        }
+      });
 
   })
 
-} */
+} 
+
+
+/*
+  Need to develop this further. 
+
+  Need to have a way to turn off the oscillator properly...
+
+  The thing fires off, but it doesn't seem to actually stop it. 
+
+
+*/
+
+
+
+soundOff() {
+  const body = document.querySelector('body');
+
+  body.addEventListener('keyup', (event) => {
+    if(!event.metakey) {
+      event.preventDefault();
+    }
+
+      /*
+        I wanna use Array.of() since it comes back with a proper Array with the DOM elements, 
+
+        but it seems that it doesn't want to play... Gotta use the ``for`` loop for now.
+
+        This also affects the soundOn function
+
+      */
+          let context = new(window.AudioContext || window.webkitAudioContext)();
+          
+        let noteKeys = document.querySelectorAll('.display_key');
+
+        for(let x=0; x< noteKeys.length; x++) {
+          let noted = noteKeys[x]; 
+          if(noted.virtualKCode) {
+            console.log('it exists!');
+            if(noted.virtualKCode == event.keyCode) {
+              noted.classList.remove('active_key');
+              let now = context.currentTime;
+              noted.toneGen.stop(now); 
+
+            }
+          } else {
+            
+          }
+        }
+  })
+}
+
   renderDiv() {
     let makeEle = new MakeElement;
     let pianoContainer = makeEle.createEle('div','piano_container',[12,12,12,12],['baseContent','pianoContainer']);
