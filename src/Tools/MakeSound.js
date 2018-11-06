@@ -12,40 +12,51 @@
     Not much out there in terms of help, so it's gonna be a new frontier. 
 
 
-*/
+    -- Update -- 
+    Re doing it because I was going at it wrong. 
 
+    Instead of creating an oscillator at the event time was dumb. 
+
+    This time create multiple oscillators and change the volume instead. 
+
+
+
+    *** Currently using Steve Kinney's oscillator solution. ***
+
+
+        - Create an oscillator for each key
+        - Have them all muted when constructed.
+        - When key is pressed, volume is increased to volume variable
+        - Re-render/re-create the keys when volume or settings is adjusted to reflect
+          changes. 
+
+
+
+*/
+import context from './audioContext.js';
 
 export default class MakeSound {
-  constructor(context,volum) {
-    this.context = context;
-    this.volume = volum;
-    this.oscillator = this.context.createOscillator();
-    this.gainNode = this.context.createGain();
+  constructor(context, frequency) {
+    this.oscillator = context.createOscillator();
+    this.gainNode = context.createGain();
+    this.volume = this.gainNode.gain;
+ console.log(frequency);
+    this.oscillator.frequency.value = frequency;
 
-    this.init(); 
-  } 
-  init() {
+    this.volume.value = 0;
 
     this.oscillator.connect(this.gainNode);
-    this.gainNode.connect(this.context.destination);
-     // Needs to be set in 1^10 values. 1 is max.
-  }
-  play(value,time,type) {
-    
-   
+    this.gainNode.connect(context.destination);
 
-    this.oscillator.frequency.value = value;
-    this.oscillator.type = type ? type : 'square';
-    this.type = type;
-    this.gainNode.gain.value = this.volume;
-    this.oscillator.start(time);
-
+    this.oscillator.start(0);
    
+    console.log('oscillator started');
   } 
-  stop(time) {
-    console.log('this is in stop()'); 
-    this.gainNode.gain.exponentialRampToValueAtTime(0.0001, 3.25);
-    this.oscillator.stop(1.25);
 
+  start(volSet) {
+    this.volume.value = volSet;
+  }
+  stop() {
+    this.volume.value = 0;
   }
 }

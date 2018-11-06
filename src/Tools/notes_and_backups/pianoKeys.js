@@ -1,7 +1,6 @@
 import MakeElement from '../Tools/MakeElement';
 import MakeSound from '../Tools/MakeSound';
 import context from '../Tools/audioContext';
-import Synth from '../Tools/Synth'; 
 // Needs to be made into its own seperate component. 
 
 /*
@@ -88,6 +87,7 @@ const chords = [{'chordName':'major','chordTones':[0,4,7]},
               {'chordName':'add9','chordTones':[0,4,7,2]}
   ];
 
+
 // Returns higher octave
 function raiseOctave(tone){    
     return tone *2;
@@ -96,6 +96,7 @@ function raiseOctave(tone){
 function lowerOctave(tone){    
     return tone / 2;
 }
+
 
 
 
@@ -240,21 +241,6 @@ soundOff() {
   })
 }
 */
-  initializeOscillators() {
-    const skeletonVirtualSynth = new Array(this.numberOfKeys).fill(null); 
-    const destination = context.destination;
-    const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
-      let octaveNum = i%12;
-
-      Synth(i,octaveNum);
-      
-    })
-
-
-
-
-  }
-
   renderDiv() {
     let makeEle = new MakeElement;
     let pianoContainer = makeEle.createEle('div','piano_container',[12,12,12,12],['baseContent','pianoContainer']);
@@ -292,9 +278,9 @@ soundOff() {
       let displayKey = makeEle.createEle('div','key_'+i,null,['display_key',whiteOrBlackKey]);
       displayKey.innerHTML = `<div class='keyNote'>${notes[octaveNum].rootNote}</div>`;
       displayKey.keyFreq = whatsYourFrequencyKenneth(i);
+      
 
-
-
+      console.log(displayKey);
 
 
 
