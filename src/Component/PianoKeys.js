@@ -187,6 +187,11 @@ export default class PianoKeys {
     })
   }
 
+/*
+
+    Need to redo this. 
+*/
+
   soundOff() {
     const body = document.querySelector('body');
     body.addEventListener('keyup', (event) => {
