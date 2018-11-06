@@ -66,18 +66,18 @@ const auxKeycode = {
 
 
 // Set at Middle C.
-const notes = [     {'tone':261,'rootNote':'c','kCode':[keycodes[0],octKeycode[0]]},  // 0
-                 {'tone':277,'rootNote':'c#','kCode':[keycodes[1],octKeycode[1]]}, // 1
-                 {'tone':293,'rootNote':'d','kCode':[keycodes[2],octKeycode[2]]},   // 2 
-                 {'tone':311,'rootNote':'d#','kCode':[keycodes[3],octKeycode[3]]}, // 3 
-                 {'tone':329,'rootNote':'e','kCode':[keycodes[4],octKeycode[4]]},   // 4
-                 {'tone':349,'rootNote':'f','kCode':[keycodes[5],octKeycode[5]]},   // 5 
-                 {'tone':369,'rootNote':'f#','kCode':[keycodes[6],octKeycode[6]]}, // 6
-                 {'tone':392,'rootNote':'g','kCode':[keycodes[7],octKeycode[7]]},   // 7
-                 {'tone':415,'rootNote':'g#','kCode':[keycodes[8],octKeycode[8]]}, // 8
-                 {'tone':440,'rootNote':'a','kCode':[keycodes[9],octKeycode[9]]},   // 9
-                 {'tone':466,'rootNote':'a#','kCode':[keycodes[10],octKeycode[10]]}, //10 
-                 {'tone':493,'rootNote':'b','kCode':[keycodes[11],octKeycode[11]]}];  //11
+const notes = [     {'tone':261,'rootNote':'c','kCode':[keycodes[0],octKeycode[0]],'eventIndex':[0,12,24,36]},  // 0
+                 {'tone':277,'rootNote':'c#','kCode':[keycodes[1],octKeycode[1]],'eventIndex':[1,13,25,37]}, // 1
+                 {'tone':293,'rootNote':'d','kCode':[keycodes[2],octKeycode[2]],'eventIndex':[2,14,26,38]},   // 2 
+                 {'tone':311,'rootNote':'d#','kCode':[keycodes[3],octKeycode[3]],'eventIndex':[3,15,27,39]}, // 3 
+                 {'tone':329,'rootNote':'e','kCode':[keycodes[4],octKeycode[4]],'eventIndex':[4,16,28,40]},   // 4
+                 {'tone':349,'rootNote':'f','kCode':[keycodes[5],octKeycode[5]],'eventIndex':[5,17,29,41]},   // 5 
+                 {'tone':369,'rootNote':'f#','kCode':[keycodes[6],octKeycode[6]],'eventIndex':[6,18,30,42]}, // 6
+                 {'tone':392,'rootNote':'g','kCode':[keycodes[7],octKeycode[7]],'eventIndex':[7,19,31,43]},   // 7
+                 {'tone':415,'rootNote':'g#','kCode':[keycodes[8],octKeycode[8]],'eventIndex':[8,20,32,44]}, // 8
+                 {'tone':440,'rootNote':'a','kCode':[keycodes[9],octKeycode[9]],'eventIndex':[9,21,33,45]},   // 9
+                 {'tone':466,'rootNote':'a#','kCode':[keycodes[10],octKeycode[10]],'eventIndex':[10,22,34,46]}, //10 
+                 {'tone':493,'rootNote':'b','kCode':[keycodes[11],octKeycode[11]],'eventIndex':[11,23,35,47]}];  //11
 const chords = [{'chordName':'major','chordTones':[0,4,7]},
               {'chordName':'minor','chordTones':[0,3,7]},
               {'chordName':'6th','chordTones':[0,4,7,9]},
@@ -103,7 +103,7 @@ export default class PianoKeys {
   constructor() {
     this.numberOfKeys = 48;
     this.state = {
-      volume: 0.001,
+      volume: 1,
 
     }
 
@@ -119,142 +119,135 @@ export default class PianoKeys {
 
 */
 
-
-
-
-soundOn(noted) { // Formely known as soundOff *****
-/*
-  const body = document.querySelector('body');
-  let context = new(window.AudioContext || window.webkitAudioContext)();
-  let tone = null;
-  let now = null;
-  let isPressed = false;
-  body.addEventListener('keydown', (event) => {
-    if(!event.metakey) {
-      event.preventDefault();
-    } 
-
-    console.log(event.key);
-
-    let shifted = event.shiftKey ? true : false;
-    now = context.currentTime;
-    let noteKeys = document.querySelectorAll('.display_key');
-    if(event.repeat) {
-      return null;
-    }
-
-      notes.forEach((note,i) => {
-
-        for(let x=0; x<noteKeys.length;x++) {
-          let keyTouch = noteKeys[x];
-          let actualKey = i + 1;
-           switch(event.keyCode) {
-            case note.kCode[0]:
-
-              if(shifted) {
-                document.querySelector('#key_'+(actualKey-1)).virtualKCode = note.kCode[0];
-                document.querySelector('#key_'+(actualKey-1)).toneGen = new MakeSound(context, this.state.volume)
-                document.querySelector('#key_'+(actualKey-1)).toneGen.play(lowerOctave(note.tone), now + 0.25);
-                keyTouch.classList.remove('active_key');
-                document.querySelector('#key_'+(actualKey-1)).classList.add('active_key');
-              } else {
-                 document.querySelector('#key_'+(actualKey+11)).virtualKCode = note.kCode[0];
-                document.querySelector('#key_'+(actualKey+11)).toneGen = new MakeSound(context, this.state.volume);
-                document.querySelector('#key_'+(actualKey+11)).toneGen.play(note.tone, now + 0.25);
-                keyTouch.classList.remove('active_key');
-                document.querySelector('#key_'+(actualKey+11)).classList.add('active_key');
-              }
-              
-              break;
-            case note.kCode[1]: 
-
-              if(shifted) {
-                document.querySelector('#key_'+(actualKey+35)).virtualKCode = note.kCode[1];
-                document.querySelector('#key_'+(actualKey+35)).toneGen = new MakeSound(context, this.state.volume);
-                document.querySelector('#key_'+(actualKey+35)).toneGen.play(raiseOctave(raiseOctave(note.tone)), now + 0.25);
-                keyTouch.classList.remove('active_key');
-                document.querySelector('#key_'+(actualKey+35)).classList.add('active_key');
-              } else {
-                document.querySelector('#key_'+(actualKey+23)).virtualKCode = note.kCode[1];
-                document.querySelector('#key_'+(actualKey+23)).toneGen = new MakeSound(context, this.state.volume);
-                document.querySelector('#key_'+(actualKey+23)).toneGen.play(raiseOctave(note.tone), now + 0.25);
-                keyTouch.classList.remove('active_key');
-                document.querySelector('#key_'+(actualKey+23)).classList.add('active_key');
-              }
-              
-          }
-        }
-      });
-
-  })
-*/
-} 
-
-
-/*
-  Need to develop this further. 
-
-  Need to have a way to turn off the oscillator properly...
-
-  The thing fires off, but it doesn't seem to actually stop it. 
-
-
-*/
-
-      /*
-        I wanna use Array.of() since it comes back with a proper Array with the DOM elements, 
-
-        but it seems that it doesn't want to play... Gotta use the ``for`` loop for now.
-
-        This also affects the soundOn function
-
-      */
-
-/*
-soundOff() {
-  const body = document.querySelector('body');
-
-  body.addEventListener('keyup', (event) => {
-    if(!event.metakey) {
-      event.preventDefault();
-    }
-
-          let context = new(window.AudioContext || window.webkitAudioContext)();
-          
-        let noteKeys = document.querySelectorAll('.display_key');
-
-        for(let x=0; x< noteKeys.length; x++) {
-          let noted = noteKeys[x]; 
-          if(noted.virtualKCode) {
-            console.log('it exists!');
-            if(noted.virtualKCode == event.keyCode) {
-              noted.classList.remove('active_key');
-              let now = context.currentTime;
-              noted.toneGen.stop(now); 
-
-            }
-          } else {
-            
-          }
-        }
-  })
-}
-*/
   initializeOscillators() {
     const skeletonVirtualSynth = new Array(this.numberOfKeys).fill(null); 
     const destination = context.destination;
     const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
       let octaveNum = i%12;
-
       Synth(i,octaveNum);
-      
+    })
+  }
+  soundOn() {
+    const body = document.querySelector('body');
+    body.addEventListener('keydown', (event) => {
+    if(!event.metakey) {
+      event.preventDefault();
+    }
+
+    console.log(event);
+    let noteKeys = this.numberOfKeys;
+    let shifted = event.shiftKey ? true : false;
+    let virtualKeys = [];
+    for(let x=0; x<noteKeys; x++) {
+     virtualKeys.push(document.querySelector('#key_'+x));
+    
+    }
+
+/*
+    Runs through the notes hash and checks the event key code. 
+    If matches, then it will start the oscillator with the volume set. 
+
+
+
+*/
+
+    notes.map((note,i) => {
+      let notePosition = 12;
+      switch(event.keyCode) {
+        case note.kCode[0] :
+          if(shifted) {
+            virtualKeys[note.eventIndex[0]].classList.add('active_key');
+            notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
+            Synth(notePosition).start(this.state.volume);
+
+          } else {
+            virtualKeys[note.eventIndex[1]].classList.add('active_key');
+            notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
+
+            Synth(notePosition).start(this.state.volume);
+          }
+          break;
+        case note.kCode[1] :
+          if(shifted) {
+            virtualKeys[note.eventIndex[3]].classList.add('active_key');
+            notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
+            Synth(notePosition).start(this.state.volume);
+
+          } else {
+            virtualKeys[note.eventIndex[2]].classList.add('active_key');
+            notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
+            
+            Synth(notePosition).start(this.state.volume);
+          }
+          break;          
+      }
     })
 
 
-
-
+    })
   }
 
+  soundOff() {
+    const body = document.querySelector('body');
+    body.addEventListener('keyup', (event) => {
+    if(!event.metakey) {
+      event.preventDefault();
+    }
+
+
+    console.log('key up');
+    console.log(event);
+    let noteKeys = this.numberOfKeys;
+    let shifted = event.shiftKey ? true : false;
+    let virtualKeys = [];
+    for(let x=0; x<noteKeys; x++) {
+     virtualKeys.push(document.querySelector('#key_'+x));
+    
+    }
+
+/*
+    Runs through the notes hash and checks the event key code. 
+    If matches, then it will start the oscillator with the volume set. 
+
+
+
+*/
+
+    notes.map((note,i) => {
+      let notePosition = 12;
+      switch(event.keyCode) {
+        case note.kCode[0] :
+          if(shifted) {
+            virtualKeys[note.eventIndex[0]].classList.remove('active_key');
+            notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
+            Synth(notePosition).stop();
+
+          } else {
+            virtualKeys[note.eventIndex[1]].classList.remove('active_key');
+            notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
+
+            Synth(notePosition).stop(0);
+          }
+          break;
+        case note.kCode[1] :
+          if(shifted) {
+            virtualKeys[note.eventIndex[3]].classList.remove('active_key');
+            notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
+            Synth(notePosition).stop(0);
+
+          } else {
+            virtualKeys[note.eventIndex[2]].classList.remove('active_key');
+            notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
+            
+            Synth(notePosition).stop(0);
+          }
+          break;          
+      }
+    })
+
+
+    })
+  }
   renderDiv() {
     let makeEle = new MakeElement;
     let pianoContainer = makeEle.createEle('div','piano_container',[12,12,12,12],['baseContent','pianoContainer']);
@@ -271,18 +264,21 @@ soundOff() {
       let blackKeys = [1,3,6,8,10];
       let whiteOrBlackKey = 'white_key';
       let whichKey = 'whiteKeyContainer';
-      
-      let whatsYourFrequencyKenneth = (i) => {
-        if(i >= 23 && i <= 35) {
-          return raiseOctave(notes[octaveNum].tone);
-        } else if (i > 11 && i < 22) {
-          return notes[octaveNum].tone;          
+      let freqName = null;
+
+      if(i >= 23 && i <= 35) {
+          freqName = notes[octaveNum].rootNote + '5';
+          
+        } else if (i >= 11 && i <= 22) {
+          freqName = notes[octaveNum].rootNote + '4';
+                   
         } else if(i >= 36) {
-          return raiseOctave(raiseOctave(notes[octaveNum].tone));
+          freqName = notes[octaveNum].rootNote + '6';
+          
         } else {
-           return lowerOctave(notes[octaveNum].tone);
-        }
-      }
+           freqName = notes[octaveNum].rootNote + '3';  
+       }
+
 
       if(blackKeys.includes(octaveNum)) {
         whiteOrBlackKey = 'black_key';
@@ -291,13 +287,8 @@ soundOff() {
      
       let displayKey = makeEle.createEle('div','key_'+i,null,['display_key',whiteOrBlackKey]);
       displayKey.innerHTML = `<div class='keyNote'>${notes[octaveNum].rootNote}</div>`;
-      displayKey.keyFreq = whatsYourFrequencyKenneth(i);
-
-
-
-
-
-
+      displayKey.renderedNote = freqName;
+      displayKey.keyPosition = i;
 
 
       eval(whichKey).append(displayKey);

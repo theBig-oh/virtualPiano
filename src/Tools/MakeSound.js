@@ -40,23 +40,21 @@ export default class MakeSound {
     this.oscillator = context.createOscillator();
     this.gainNode = context.createGain();
     this.volume = this.gainNode.gain;
- console.log(frequency);
-    this.oscillator.frequency.value = frequency;
 
+    this.oscillator.frequency.value = frequency;
     this.volume.value = 0;
 
     this.oscillator.connect(this.gainNode);
     this.gainNode.connect(context.destination);
 
     this.oscillator.start(0);
-   
-    console.log('oscillator started');
   } 
 
   start(volSet) {
+    console.log(volSet);
     this.volume.value = volSet;
   }
-  stop() {
+  stop(volSet) {
     this.volume.value = 0;
   }
 }

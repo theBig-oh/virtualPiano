@@ -65,7 +65,7 @@ function Synth(kPosition,octaveValue) {
           actualFreq = raiseOctave(notes[octaveNum].tone);
         } else if (kPosition >= 11 && kPosition <= 22) {
           freqName = notes[octaveNum].rootNote + '4';
-          actualFreq = notes[octaveNum].rootNote.tone;          
+          actualFreq = notes[octaveNum].tone;          
         } else if(kPosition >= 36) {
           freqName = notes[octaveNum].rootNote + '6';
           actualFreq = raiseOctave(raiseOctave(notes[octaveNum].tone));
@@ -78,32 +78,10 @@ function Synth(kPosition,octaveValue) {
     frequencyInfo(kPosition);
     virtualBoard[freqName] = new MakeSound(context,actualFreq);
   }
-  console.log(kPosition);
   console.log(virtualBoard);
   return virtualBoard[freqName];
-
-
 }
 
 
 export default Synth;
 
-/*
-  const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
-    let octaveNum = i%12;
-
-      let frequencyTone = (kPosition) => {
-        if(x >= 23 && x <= 35) {
-          return raiseOctave(notes[octaveNum].tone);
-        } else if (x > 11 && x < 22) {
-          return notes[octaveNum].tone;          
-        } else if(x >= 36) {
-          return raiseOctave(raiseOctave(notes[octaveNum].tone));
-        } else {
-           return lowerOctave(notes[octaveNum].tone);
-        }
-      };
-      let actualFreq = frequencyTone(i);
-      vKey = new MakeSound(context,actualFreq);
-      
-    })*/

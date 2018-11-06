@@ -46,8 +46,8 @@ export default class BaseLevel {
   
     baseDiv.appendChild(pianoKeys.renderDiv());
     pianoKeys.initializeOscillators(); 
-   // pianoKeys.soundOn(); // Plays notes
-    //pianoKeys.soundOff(); // Stops notes
+    pianoKeys.soundOn(); // Plays notes
+    pianoKeys.soundOff(); // Stops notes
 
     return baseDiv  
   }
