@@ -24,9 +24,10 @@
     *** Currently using Steve Kinney's oscillator solution. ***
 
 
-        - Create an oscillator for each key
-        - Have them all muted when constructed.
-        - When key is pressed, volume is increased to volume variable
+        - Create an oscillator for each key -- Done
+        - Have them all muted when constructed. -- Done
+        - When key is pressed, volume is increased to volume variable -- Done 
+        - Have oscillator muted again once key is released 
         - Re-render/re-create the keys when volume or settings is adjusted to reflect
           changes. 
 
