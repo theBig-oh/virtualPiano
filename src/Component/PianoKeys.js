@@ -149,8 +149,6 @@ export default class PianoKeys {
     Runs through the notes hash and checks the event key code. 
     If matches, then it will start the oscillator with the volume set. 
 
-
-
 */
 
     notes.map((note,i) => {
@@ -165,9 +163,6 @@ export default class PianoKeys {
           } else {
             virtualKeys[note.eventIndex[1]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
-/*
-            Synth(notePosition).start(this.state.volume);
-*/ 
             this.state.activeSynth[notePosition].start(this.state.volume);
           }
           break;
@@ -175,7 +170,7 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
-            Synth(notePosition).start(this.state.volume); 
+            this.state.activeSynth[notePosition].start(this.state.volume);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
@@ -194,6 +189,9 @@ export default class PianoKeys {
 /*
 
     Need to redo this. 
+
+    It's pretty much the same code as SoundOn() except dealing with a keyup 
+    than keydown. 
 */
 
   soundOff() {
@@ -219,6 +217,10 @@ export default class PianoKeys {
     If matches, then it will start the oscillator with the volume set. 
 
 
+    Definitely needs to be cleaned up to make it easier to read. 
+
+    So far it works. 
+
 
 */
 
@@ -229,28 +231,23 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
-        
             this.state.activeSynth[notePosition].stop(0);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
-
             this.state.activeSynth[notePosition].stop(0);
           }
           break;
         case note.kCode[1] :
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.remove('active_key');
-            notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
-            
+            notePosition = virtualKeys[note.eventIndex[3]].keyPosition;          
             this.state.activeSynth[notePosition].stop(0);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
-            
-            
             this.state.activeSynth[notePosition].stop(0);
           }
           break;          
@@ -273,22 +270,28 @@ export default class PianoKeys {
 
     let keys = keyAmount.map((key,i) => {
       let octaveNum = i%12; // returns from 0 - 11, easier to identify sharps/flats
-      let blackKeys = [1,3,6,8,10];
+      let blackKeys = [1,3,6,8,10];  // Flat/Sharp keys index identifiers. 
       let whiteOrBlackKey = 'white_key';
       let whichKey = 'whiteKeyContainer';
       let freqName = null;
+      let synthKey = null; 
 
+      // Splits up notes to approriate octave row 
       if(i >= 23 && i <= 35) {
           freqName = notes[octaveNum].rootNote + '5';
+          synthKey = notes[octaveNum].eventIndex[2];
           
         } else if (i >= 11 && i <= 22) {
           freqName = notes[octaveNum].rootNote + '4';
+          synthKey = notes[octaveNum].eventIndex[1];
                    
         } else if(i >= 36) {
           freqName = notes[octaveNum].rootNote + '6';
+          synthKey = notes[octaveNum].eventIndex[3];
           
         } else {
-           freqName = notes[octaveNum].rootNote + '3';  
+           freqName = notes[octaveNum].rootNote + '3'; 
+           synthKey = notes[octaveNum].eventIndex[0]; 
        }
 
 
@@ -301,26 +304,20 @@ export default class PianoKeys {
       displayKey.innerHTML = `<div class='keyNote'>${notes[octaveNum].rootNote}</div>`;
       displayKey.renderedNote = freqName;
       displayKey.keyPosition = i;
-
+      displayKey.synthKey = synthKey;
 
       eval(whichKey).append(displayKey);
-      
+      console.log(displayKey);
 
-      displayKey.addEventListener('click', () => {
-        let tone = new MakeSound(context);
-        let now = context.currentTime;
-
-        if(i > 23 && i <= 35) {
-          tone.play(raiseOctave(notes[octaveNum].tone), now);
-        } else if (i > 11 && i < 22) {
-          tone.play(notes[octaveNum].tone, now);          
-        } else if(i >= 36) {
-          tone.play(raiseOctave(raiseOctave(notes[octaveNum].tone)), now);
-        } else {
-           tone.play(lowerOctave(notes[octaveNum].tone), now);
-        }
+      displayKey.addEventListener('mouseenter', () => {
+        console.log(this.state);
+        console.log(displayKey.keyPosition);
+        console.log('this has entered');
+        this.state.activeSynth[displayKey.keyPosition].start(this.state.volume);
       })
-
+      displayKey.addEventListener('mouseleave', () => {
+        this.state.activeSynth[displayKey.keyPosition].stop(0);
+      })
     });    
     key_container.append(whiteKeyContainer, blackKeyContainer);
 

@@ -57,7 +57,7 @@ function Synth(kPosition,octaveValue) {
   let octaveNum = kPosition % 12;
   let actualFreq = 440; 
   let freqName = null;
-
+  console.log(kPosition);
   let frequencyInfo = (kPosition) => {
         let octaveNum = kPosition%12;
         if(kPosition >= 23 && kPosition <= 35) {
