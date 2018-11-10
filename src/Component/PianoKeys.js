@@ -28,6 +28,7 @@ import Synth from '../Tools/Synth';
     Gonna have to test out some configurations for laptop support, and see if I can check keyboard keycount beforehand.
 
 */
+const makeEle = new MakeElement;
 
 //              z  s  x  d  c  v  g  b  h   n  j
 const keycodes = [90,83,88,68,67,86,71,66,72,78,74,77];
@@ -36,6 +37,9 @@ const keycodes = [90,83,88,68,67,86,71,66,72,78,74,77];
 const octKeycode = [89,55,85,56,73,79,48,80,173,219,61,221];
 //                y   7 u   8  i  o 0   p  -   [   =  ]
 
+
+
+// This is more intended for a full scale keyboard. 
 const auxKeycode = {
                     "numPad":[
                               96, //  0
@@ -124,33 +128,35 @@ export default class PianoKeys {
     const destination = context.destination;
     const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
       let octaveNum = i%12;
-      Synth(i,octaveNum);
       this.state.activeSynth.push(Synth(i,octaveNum));
     })
     console.log(this.state);
   }
+
+  synthConsole() {
+    let synthConsole = makeEle.createEle('div','synth_console',[12,12,12,12],'synthConsole');
+    let speakersCount = Array(6).fill(null);
+
+    return synthConsole
+  }
+
   soundOn() {
     const body = document.querySelector('body');
     body.addEventListener('keydown', (event) => {
     if(!event.metakey) {
       event.preventDefault();
     }
-
-    console.log(event);
     let noteKeys = this.numberOfKeys;
     let shifted = event.shiftKey ? true : false;
     let virtualKeys = [];
     for(let x=0; x<noteKeys; x++) {
-     virtualKeys.push(document.querySelector('#key_'+x));
-    
+     virtualKeys.push(document.querySelector('#key_'+x));  
     }
-
 /*
     Runs through the notes hash and checks the event key code. 
     If matches, then it will start the oscillator with the volume set. 
 
 */
-
     notes.map((note,i) => {
       let notePosition = 12;
       switch(event.keyCode) {
@@ -174,15 +180,12 @@ export default class PianoKeys {
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
-            notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
-            
+            notePosition = virtualKeys[note.eventIndex[2]].keyPosition;      
             this.state.activeSynth[notePosition].start(this.state.volume);
           }
           break;          
       }
     })
-
-
     })
   }
 
@@ -200,10 +203,6 @@ export default class PianoKeys {
     if(!event.metakey) {
       event.preventDefault();
     }
-
-
-    console.log('key up');
-    console.log(event);
     let noteKeys = this.numberOfKeys;
     let shifted = event.shiftKey ? true : false;
     let virtualKeys = [];
@@ -253,12 +252,10 @@ export default class PianoKeys {
           break;          
       }
     })
-
-
     })
   }
   renderDiv() {
-    let makeEle = new MakeElement;
+
     let pianoContainer = makeEle.createEle('div','piano_container',[12,12,12,12],['baseContent','pianoContainer']);
 
     let keyboardDisplay = makeEle.createEle('div','keyboard_display', [12,12,12,12],'keyboardDisplay');
@@ -273,25 +270,17 @@ export default class PianoKeys {
       let blackKeys = [1,3,6,8,10];  // Flat/Sharp keys index identifiers. 
       let whiteOrBlackKey = 'white_key';
       let whichKey = 'whiteKeyContainer';
-      let freqName = null;
-      let synthKey = null; 
+      let freqName, displayKey = null;
 
       // Splits up notes to approriate octave row 
-      if(i >= 23 && i <= 35) {
+      if(i >= 24 && i <= 35) {
           freqName = notes[octaveNum].rootNote + '5';
-          synthKey = notes[octaveNum].eventIndex[2];
-          
-        } else if (i >= 11 && i <= 22) {
+        } else if (i >= 11 && i <= 23) {
           freqName = notes[octaveNum].rootNote + '4';
-          synthKey = notes[octaveNum].eventIndex[1];
-                   
         } else if(i >= 36) {
           freqName = notes[octaveNum].rootNote + '6';
-          synthKey = notes[octaveNum].eventIndex[3];
-          
         } else {
            freqName = notes[octaveNum].rootNote + '3'; 
-           synthKey = notes[octaveNum].eventIndex[0]; 
        }
 
 
@@ -300,19 +289,15 @@ export default class PianoKeys {
         whichKey = 'blackKeyContainer';
       }
      
-      let displayKey = makeEle.createEle('div','key_'+i,null,['display_key',whiteOrBlackKey]);
+      displayKey = makeEle.createEle('div','key_'+i,null,['display_key',whiteOrBlackKey]);
       displayKey.innerHTML = `<div class='keyNote'>${notes[octaveNum].rootNote}</div>`;
       displayKey.renderedNote = freqName;
       displayKey.keyPosition = i;
-      displayKey.synthKey = synthKey;
+
 
       eval(whichKey).append(displayKey);
-      console.log(displayKey);
 
       displayKey.addEventListener('mouseenter', () => {
-        console.log(this.state);
-        console.log(displayKey.keyPosition);
-        console.log('this has entered');
         this.state.activeSynth[displayKey.keyPosition].start(this.state.volume);
       })
       displayKey.addEventListener('mouseleave', () => {
@@ -321,7 +306,7 @@ export default class PianoKeys {
     });    
     key_container.append(whiteKeyContainer, blackKeyContainer);
 
-
+    keyboardDisplay.append(this.synthConsole());
     pianoContainer.append(keyboardDisplay, key_container);
     
 

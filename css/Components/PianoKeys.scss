@@ -2,6 +2,13 @@
 
 .pianoContainer {
 height: 100%;
+  
+  .keyboardDisplay {
+    border: 1px solid black;
+    height: 50%;
+    background: grey;
+  }
+
 
   .key_container {
     border: 1px solid green;
