@@ -56,6 +56,6 @@ export default class MakeSound {
     this.volume.value = volSet;
   }
   stop(volSet) {
-    this.volume.value = 0;
+    this.volume.value = volSet;
   }
 }

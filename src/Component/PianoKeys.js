@@ -104,7 +104,7 @@ export default class PianoKeys {
     this.numberOfKeys = 48;
     this.state = {
       volume: 1,
-
+      activeSynth: [],
     }
 
   }
@@ -125,7 +125,9 @@ export default class PianoKeys {
     const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
       let octaveNum = i%12;
       Synth(i,octaveNum);
+      this.state.activeSynth.push(Synth(i,octaveNum));
     })
+    console.log(this.state);
   }
   soundOn() {
     const body = document.querySelector('body');
@@ -158,26 +160,28 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
-            Synth(notePosition).start(this.state.volume);
+            this.state.activeSynth[notePosition].start(this.state.volume);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
-
+/*
             Synth(notePosition).start(this.state.volume);
+*/ 
+            this.state.activeSynth[notePosition].start(this.state.volume);
           }
           break;
         case note.kCode[1] :
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
-            Synth(notePosition).start(this.state.volume);
+            Synth(notePosition).start(this.state.volume); 
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
             
-            Synth(notePosition).start(this.state.volume);
+            this.state.activeSynth[notePosition].start(this.state.volume);
           }
           break;          
       }
@@ -225,26 +229,29 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
-            Synth(notePosition).stop();
+        
+            this.state.activeSynth[notePosition].stop(0);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
 
-            Synth(notePosition).stop(0);
+            this.state.activeSynth[notePosition].stop(0);
           }
           break;
         case note.kCode[1] :
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
-            Synth(notePosition).stop(0);
+            
+            this.state.activeSynth[notePosition].stop(0);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
             
-            Synth(notePosition).stop(0);
+            
+            this.state.activeSynth[notePosition].stop(0);
           }
           break;          
       }
