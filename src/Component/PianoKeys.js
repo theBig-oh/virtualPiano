@@ -139,10 +139,27 @@ export default class PianoKeys {
     let speakersContainer = [];
     speakersCount.map((speaker,i) => {
       let speakr = makeEle.createEle('div','synth_speaker_'+i,[12,12,12,12],'speaker');
+      let fans = null;
+      if(i <= 2) {
+        fans = 6;
+      } else {
+        fans = 3;
+      }
+      
+      for(let x=0;x<=fans;x++) {
+        let renderedFan = makeEle.createEle('div','speaker_'+i+'_fan_'+x,[12,12,12,12],['fans','speaker_'+i+'fans']);
+
+        speakr.append(renderedFan);
+      }
+
+
       speakersContainer.push(speakr);  
     })
     
     
+    let mainConsole = makeEle.createEle('div','main_console',[12,12,12,12],'mainConsole');
+
+    synthConsole.append(speakersContainer[0],mainConsole,speakersContainer[1]);
     console.log(speakersContainer);
 
 
@@ -190,7 +207,6 @@ console.log(now);
             this.state.activeSynth[notePosition].start(this.state.volume, now);
 
           } else {
-            console.log(note.kCode[1]);
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;      
             this.state.activeSynth[notePosition].start(this.state.volume, now);
