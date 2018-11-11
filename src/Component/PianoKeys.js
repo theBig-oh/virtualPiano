@@ -34,7 +34,7 @@ const makeEle = new MakeElement;
 const keycodes = [90,83,88,68,67,86,71,66,72,78,74,77];
 
 //                
-const octKeycode = [89,55,85,56,73,79,48,80,173,219,61,221];
+const octKeycode = [89,55,85,56,73,79,48,80,189,219,187,221];
 //                y   7 u   8  i  o 0   p  -   [   =  ]
 
 
@@ -119,7 +119,7 @@ export default class PianoKeys {
 
   - Collect all the keys using a querySelectorAll on .display_key
   - Have each key set up with their own oscillator on the correct frequency using the tone values
-
+  - Said Oscillators are being created in the Synth() function, and returning into this.state.activeSynth
 
 */
 
@@ -136,6 +136,15 @@ export default class PianoKeys {
   synthConsole() {
     let synthConsole = makeEle.createEle('div','synth_console',[12,12,12,12],'synthConsole');
     let speakersCount = Array(6).fill(null);
+    let speakersContainer = [];
+    speakersCount.map((speaker,i) => {
+      let speakr = makeEle.createEle('div','synth_speaker_'+i,[12,12,12,12],'speaker');
+      speakersContainer.push(speakr);  
+    })
+    
+    
+    console.log(speakersContainer);
+
 
     return synthConsole
   }
@@ -147,6 +156,7 @@ export default class PianoKeys {
       event.preventDefault();
     }
     let noteKeys = this.numberOfKeys;
+    let now = context.currentTime;
     let shifted = event.shiftKey ? true : false;
     let virtualKeys = [];
     for(let x=0; x<noteKeys; x++) {
@@ -157,6 +167,7 @@ export default class PianoKeys {
     If matches, then it will start the oscillator with the volume set. 
 
 */
+console.log(now);
     notes.map((note,i) => {
       let notePosition = 12;
       switch(event.keyCode) {
@@ -164,24 +175,25 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
-            this.state.activeSynth[notePosition].start(this.state.volume);
+            this.state.activeSynth[notePosition].start(this.state.volume, now);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
-            this.state.activeSynth[notePosition].start(this.state.volume);
+            this.state.activeSynth[notePosition].start(this.state.volume, now);
           }
           break;
         case note.kCode[1] :
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
-            this.state.activeSynth[notePosition].start(this.state.volume);
+            this.state.activeSynth[notePosition].start(this.state.volume, now);
 
           } else {
+            console.log(note.kCode[1]);
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;      
-            this.state.activeSynth[notePosition].start(this.state.volume);
+            this.state.activeSynth[notePosition].start(this.state.volume, now);
           }
           break;          
       }
@@ -203,6 +215,7 @@ export default class PianoKeys {
     if(!event.metakey) {
       event.preventDefault();
     }
+    let now = context.currentTime.toFixed(2);
     let noteKeys = this.numberOfKeys;
     let shifted = event.shiftKey ? true : false;
     let virtualKeys = [];
@@ -230,24 +243,24 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
-            this.state.activeSynth[notePosition].stop(0);
+            this.state.activeSynth[notePosition].stop(0, now);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
-            this.state.activeSynth[notePosition].stop(0);
+            this.state.activeSynth[notePosition].stop(0, now);
           }
           break;
         case note.kCode[1] :
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;          
-            this.state.activeSynth[notePosition].stop(0);
+            this.state.activeSynth[notePosition].stop(0, now);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
-            this.state.activeSynth[notePosition].stop(0);
+            this.state.activeSynth[notePosition].stop(0, now);
           }
           break;          
       }

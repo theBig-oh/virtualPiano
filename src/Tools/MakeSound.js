@@ -37,25 +37,29 @@
 import context from './audioContext.js';
 
 export default class MakeSound {
-  constructor(context, frequency) {
+  constructor(context, frequency, delay) {
     this.oscillator = context.createOscillator();
     this.gainNode = context.createGain();
     this.volume = this.gainNode.gain;
-
+    
     this.oscillator.frequency.value = frequency;
     this.volume.value = 0;
 
+    let delayValue = delay ? delay : 1;
+
+    this.delay = context.createDelay(delayValue);
+        
+    this.delay.connect(this.gainNode);
     this.oscillator.connect(this.gainNode);
     this.gainNode.connect(context.destination);
 
     this.oscillator.start(0);
   } 
 
-  start(volSet) {
-    console.log(volSet);
+  start(volSet, time) {
     this.volume.value = volSet;
   }
-  stop(volSet) {
+  stop(volSet, time) {
     this.volume.value = volSet;
   }
 }
