@@ -6,15 +6,24 @@
     MakeElement.createEle : Creates HTML element of your choosing
                             
                             Type: Takes string value, can create any element type ie "div", "span","img"
-                            Name: Takes string value, sets element Id value
+                            Name: Takes string value, sets element Id value 
+                                  *** Use '_' in ID names. Ex: base_class
                             Gridsize: Takes Array value, [xs,sm,md,lg]. Used for bootstrap's grid system
                             Custom: Takes string value, sets custom classes
                                     Uses an array if there is more than one custom class being called in.
+                                    *** Use camelCase for classes. Ex: baseClass
                                     
 
 */
 
+
+
 /* 
+
+*** Legacy ***
+    
+    - Re-writing this to become a Class than a Function
+
 function MakeElement(){     
   this.createEle = function(type,name,gridsize,custom) {
     let newElement = document.createElement(type); 

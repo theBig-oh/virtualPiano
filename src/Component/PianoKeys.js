@@ -33,7 +33,13 @@ const makeEle = new MakeElement;
 //              z  s  x  d  c  v  g  b  h   n  j
 const keycodes = [90,83,88,68,67,86,71,66,72,78,74,77];
 
-//                
+// 
+/*
+    OctKeycode has a bug dealing with keyboards. The '-' and '=' key is listed differently between a large keyboard and a laptop
+
+*/
+
+
 const octKeycode = [89,55,85,56,73,79,48,80,189,219,187,221];
 //                y   7 u   8  i  o 0   p  -   [   =  ]
 
@@ -70,7 +76,7 @@ const auxKeycode = {
 
 
 // Set at Middle C.
-const notes = [     {'tone':261,'rootNote':'c','kCode':[keycodes[0],octKeycode[0]],'eventIndex':[0,12,24,36]},  // 0
+const notes = [  {'tone':261,'rootNote':'c','kCode':[keycodes[0],octKeycode[0]],'eventIndex':[0,12,24,36]},  // 0
                  {'tone':277,'rootNote':'c#','kCode':[keycodes[1],octKeycode[1]],'eventIndex':[1,13,25,37]}, // 1
                  {'tone':293,'rootNote':'d','kCode':[keycodes[2],octKeycode[2]],'eventIndex':[2,14,26,38]},   // 2 
                  {'tone':311,'rootNote':'d#','kCode':[keycodes[3],octKeycode[3]],'eventIndex':[3,15,27,39]}, // 3 
@@ -107,10 +113,21 @@ export default class PianoKeys {
   constructor() {
     this.numberOfKeys = 48;
     this.state = {
-      volume: 1,
+      volume: [
+          1, // Master volume
+          0.5, // Mid Overtone volume
+          0.25, // Lower Overtone volume
+          0,
+          0,
+        ],
       activeSynth: [],
+      lowerOvertones: [],
+      midOvertones: [],
+      lowerlowerOvertones: [],
+      midmidOvertones: [],
+      waveType: 'sawtooth',
     }
-
+    this.soundLevel = this.soundLevel.bind(this);
   }
 
 /*
@@ -124,11 +141,16 @@ export default class PianoKeys {
 */
 
   initializeOscillators() {
+    this.state.activeSynth, this.state.lowerOvertones, this.state.midOvertones = [];
     const skeletonVirtualSynth = new Array(this.numberOfKeys).fill(null); 
     const destination = context.destination;
+
     const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
-      let octaveNum = i%12;
-      this.state.activeSynth.push(Synth(i,octaveNum));
+       let octaveNum = i%12;
+      this.state.activeSynth.push(Synth(i,octaveNum,this.state.waveType));
+      this.state.midOvertones.push(Synth(i,octaveNum,this.state.waveType));
+      this.state.lowerOvertones.push(Synth(i,octaveNum,this.state.waveType));
+      
     })
     console.log(this.state);
   }
@@ -136,18 +158,87 @@ export default class PianoKeys {
   synthConsole() {
     let synthConsole = makeEle.createEle('div','synth_console',[12,12,12,12],'synthConsole');
     let speakersCount = Array(6).fill(null);
+    let knobsCount = Array(5).fill(null);
+    let waveCount = Array(3).fill(null);
     let speakersContainer = [];
+    let knobsContainer = null;
+    let knobTypes = ['attack','decay','sustain','release',];
+    let screenDisplay = null;
+    let rightSide = null;
+    let leftSide = null;
+  
     speakersCount.map((speaker,i) => {
-      let speakr = makeEle.createEle('div','synth_speaker_'+i,[12,12,12,12],'speaker');
-      speakersContainer.push(speakr);  
-    })
-    
-    
-    console.log(speakersContainer);
+      let typeOfSpeaker = null;
+      let fans = null;
+      
+      if(i <= 2) {
+        fans = 6;
+        typeOfSpeaker = 'largeSpeaker';
+      } else {
+        fans = 3;
+        typeOfSpeaker = 'smallSpeaker';
+      }
 
+      let speakr = makeEle.createEle('div','synth_speaker_'+i,[12,12,12,12],['speaker',typeOfSpeaker]);
+            
+      for(let x=0;x<=fans;x++) {
+        let renderedFan = makeEle.createEle('div','speaker_'+i+'_fan_'+x,[12,12,12,12],['fans','speaker_'+i+'fans']);
+
+        speakr.append(renderedFan);
+      }
+      speakersContainer.push(speakr);  
+    });
+
+    screenDisplay = makeEle.createEle('div','screen_display',null,'screenDisplay');
+    let actualScreen = makeEle.createEle('div','actual_screen',null,'actualScreen');
+
+    screenDisplay.append(actualScreen);
+
+    knobsContainer = makeEle.createEle('div','knob_container',null,'knobContainer');
+    
+    knobsCount.map((knob,i) => {
+      let renderKnob = makeEle.createEle('div','knob_'+i,null,'knobs');
+      renderKnob.knobType = knobTypes[i];
+      console.log(renderKnob);
+
+      knobsContainer.append(renderKnob);
+    })
+
+
+
+    let volumeControl = makeEle.createEle('div','vol_control',null,'volumeControl');
+    let volumeKnob = makeEle.createEle('input','vol_knob',null,'volumeKnob');
+    volumeKnob.type = 'range';
+    volumeKnob.min = 0;
+    volumeKnob.max = 75; // So you're not blasting your eardrums out. 
+
+    
+    rightSide = makeEle.createEle('div','right_side',null,'rightSide');
+    leftSide = makeEle.createEle('div','left_side',null,'leftSide');
+        
+    volumeControl.append(volumeKnob);
+
+    leftSide.append(volumeControl);
+
+
+    this.soundLevel(volumeControl);
+
+
+    
+    let mainConsole = makeEle.createEle('div','main_console',[12,12,12,12],'mainConsole');
+    
+
+    mainConsole.append(leftSide ,screenDisplay, rightSide, knobsContainer);
+    synthConsole.append(speakersContainer[0],mainConsole,speakersContainer[1]);
+
+ 
 
     return synthConsole
   }
+
+
+
+
 
   soundOn() {
     const body = document.querySelector('body');
@@ -167,34 +258,51 @@ export default class PianoKeys {
     If matches, then it will start the oscillator with the volume set. 
 
 */
-console.log(now);
+
     notes.map((note,i) => {
       let notePosition = 12;
+      let midOvertone = 16;
+      let lowerOvertones = 19;
       switch(event.keyCode) {
         case note.kCode[0] :
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
-            this.state.activeSynth[notePosition].start(this.state.volume, now);
+            this.state.activeSynth[notePosition].start(this.state.volume[0], now);
+            this.state.midOvertones[notePosition+4].start(this.state.volume[1], now);
+            this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
+            this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
+            this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
-            this.state.activeSynth[notePosition].start(this.state.volume, now);
-          }
+            this.state.activeSynth[notePosition].start(this.state.volume[0], now);
+            this.state.midOvertones[notePosition+4].start(this.state.volume[1], now);
+            this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
+            this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
+            this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
+    }
           break;
         case note.kCode[1] :
           if(shifted) {
             virtualKeys[note.eventIndex[3]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;
-            this.state.activeSynth[notePosition].start(this.state.volume, now);
+            this.state.activeSynth[notePosition].start(this.state.volume[0], now);
+            this.state.midOvertones[notePosition+4].start(this.state.volume[1], now);
+            this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
+            this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
+            this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
 
           } else {
-            console.log(note.kCode[1]);
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;      
-            this.state.activeSynth[notePosition].start(this.state.volume, now);
-          }
+            this.state.activeSynth[notePosition].start(this.state.volume[0], now);
+            this.state.midOvertones[notePosition+4].start(this.state.volume[1], now);
+            this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
+            this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
+            this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
+         }
           break;          
       }
     })
@@ -244,11 +352,20 @@ console.log(now);
             virtualKeys[note.eventIndex[0]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
             this.state.activeSynth[notePosition].stop(0, now);
+            this.state.midOvertones[notePosition+4].stop(0, now);
+            this.state.lowerOvertones[notePosition+7].stop(0, now);
+            this.state.midmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerOvertones[notePosition+4].stop(0, now);
+
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[1]].keyPosition;
             this.state.activeSynth[notePosition].stop(0, now);
+            this.state.midOvertones[notePosition+4].stop(0, now);
+            this.state.lowerOvertones[notePosition+7].stop(0, now);
+            this.state.midmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerOvertones[notePosition+4].stop(0, now);            
           }
           break;
         case note.kCode[1] :
@@ -256,11 +373,19 @@ console.log(now);
             virtualKeys[note.eventIndex[3]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[3]].keyPosition;          
             this.state.activeSynth[notePosition].stop(0, now);
+            this.state.midOvertones[notePosition+4].stop(0, now);
+            this.state.lowerOvertones[notePosition+7].stop(0, now);            
+            this.state.midmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerOvertones[notePosition+4].stop(0, now);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.remove('active_key');
             notePosition = virtualKeys[note.eventIndex[2]].keyPosition;
             this.state.activeSynth[notePosition].stop(0, now);
+            this.state.midOvertones[notePosition+4].stop(0, now);
+            this.state.lowerOvertones[notePosition+7].stop(0, now);          
+            this.state.midmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerOvertones[notePosition+4].stop(0, now);          
           }
           break;          
       }
@@ -311,7 +436,7 @@ console.log(now);
       eval(whichKey).append(displayKey);
 
       displayKey.addEventListener('mouseenter', () => {
-        this.state.activeSynth[displayKey.keyPosition].start(this.state.volume);
+        this.state.activeSynth[displayKey.keyPosition].start(this.state.volume[0]);
       })
       displayKey.addEventListener('mouseleave', () => {
         this.state.activeSynth[displayKey.keyPosition].stop(0);
@@ -322,8 +447,22 @@ console.log(now);
     keyboardDisplay.append(this.synthConsole());
     pianoContainer.append(keyboardDisplay, key_container);
     
-
+    
     return pianoContainer;
+  }
+  soundLevel(vlControl) {
+    let dragged = false;
+    console.log(vlControl.children[0]);
+    vlControl.children[0].addEventListener('input', (event) => {
+      console.log(vlControl.children[0].value);
+      console.log((vlControl.children[0].value / 10));
+      this.state.volume[0] = (vlControl.children[0].value / 10);
+      this.state.volume[1] = (this.state.volume[0] / 2);
+      this.state.volume[2] = (this.state.volume[1] / 2);
+      this.state.volume[3] = (this.state.volume[2] / 2);
+      this.state.volume[4] = (this.state.volume[3] / 2);
+    })
+
   }
 
 }

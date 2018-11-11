@@ -45,7 +45,7 @@ const virtualBoard = {};
 
 
 
-function Synth(kPosition,octaveValue) {
+function Synth(kPosition,octaveValue,wavetype) {
 
   let octaveNum = kPosition % 12;
   let actualFreq = 440; 
@@ -69,7 +69,7 @@ function Synth(kPosition,octaveValue) {
       };
   if(!virtualBoard[freqName]) {
     frequencyInfo(kPosition);
-    virtualBoard[freqName] = new MakeSound(context,actualFreq);
+    virtualBoard[freqName] = new MakeSound(context,actualFreq, wavetype);
   }
   return virtualBoard[freqName];
 }

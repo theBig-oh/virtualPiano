@@ -1,5 +1,16 @@
 @import './Components/index.scss';
 
+/* 
+
+  There's initial padding due to the bootstrap, 
+    
+  Use !important to override it when necessary. 
+
+ */
+.noPadding {
+  padding: 0;
+}
+
 .bodyContain {
   height: 100vh;
 }
