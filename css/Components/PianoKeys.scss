@@ -1,31 +1,24 @@
 
 
 .pianoContainer {
-height: 100%;
-  
-  .keyboardDisplay {
-    border: 1px solid black;
-    height: 50%;
-    background: grey;
-  }
-
+  height: 100%;
+  padding: 4% !important;
 
   .key_container {
-    border: 1px solid green;
     height: 50%;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    padding: 0; 
+    padding: 0;  
     .pianoKeysContainer {
-      border: 1px solid black;
       display: flex;
       flex-direction: row;
       flex-wrap: no-wrap;
       padding: 0;
+      border: 1px none;
        .display_key {
         background: white;
-        border: 1px solid black;
+        border: 1px none;
         padding: 0;
         display: flex;
         align-items: flex-end;
@@ -34,19 +27,51 @@ height: 100%;
         &.white_key {
           background: white;
           border: 2px solid black;
+          border-top: 1px none !important;
+          border-bottom: 3px solid black;
           height: 100%;
           width: 5%;
           padding: 0;
+          
+          &.active_key {
+
+            /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#9c1514+0,000000+100&0.65+0,0+100 */
+            background: -moz-linear-gradient(top, rgba(156,21,20,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+            background: -webkit-linear-gradient(top, rgba(156,21,20,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+            background: linear-gradient(to bottom, rgba(156,21,20,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a69c1514', endColorstr='#00000000',GradientType=0 ); /* IE6-9 */
+
+
+            
+          }
+          &:first-of-type {
+            border-left: 3px solid black;
+          }
+          &:last-of-type {
+            border-right: 3px solid black;
+          }
         }
         &.black_key {
           background: black;
           border: 2px solid white;
+          border-top: 1px none !important;
           color: white;
           height: 60%;
+
+
+          &.active_key {
+
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#dc0b00+0,000000+100 */
+background: rgb(220,11,0),black; /* Old browsers */
+background: -moz-linear-gradient(top, rgba(220,11,0,1) 0%, rgba(0,0,0,1) 100%),black; /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(220,11,0,1) 0%,rgba(0,0,0,1) 100%),black; /* Chrome10-25,Safari5.1-6 */
+background:  linear-gradient(to bottom, rgba(220,11,0,1) 0%,rgba(0,0,0,1) 100%),black; /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dc0b00', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+
+
+          }
         }
-        &.active_key {
-          background:  red;
-        }
+
       }
 
     }
@@ -54,7 +79,7 @@ height: 100%;
 
       > div {
         position: relative;
-        top: -101%;
+        top: -100.5%;
       }
       #key_1 {
         left: 2%;

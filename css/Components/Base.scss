@@ -6,20 +6,18 @@
 
 
   .key_container {
-    border: 1px solid green;
     height: 50%;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
 
     .pianoKeysContainer {
-      border: 1px solid black;
       display: flex;
       flex-direction: row;
       flex-wrap: no-wrap;
        .display_key {
         background: white;
-        border: 1px solid black;
+
         height: 40%;
         width: 3%;
 

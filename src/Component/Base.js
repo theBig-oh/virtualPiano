@@ -48,7 +48,6 @@ export default class BaseLevel {
     pianoKeys.initializeOscillators(); 
     pianoKeys.soundOn(); // Plays notes
     pianoKeys.soundOff(); // Stops notes
-
     return baseDiv  
   }
 }
