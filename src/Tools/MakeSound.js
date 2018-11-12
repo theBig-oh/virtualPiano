@@ -57,4 +57,7 @@ export default class MakeSound {
   stop(volSet, time) {
     this.volume.value = volSet;
   }
+  disconnect() {
+    this.oscillator.disconnect();
+  }
 }

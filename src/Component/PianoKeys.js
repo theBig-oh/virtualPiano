@@ -164,6 +164,7 @@ export default class PianoKeys {
 
           if(this.state.currentLoaded) {
             
+            synArray[x].disconnect();
             synArray[x] = null;
           }
 
