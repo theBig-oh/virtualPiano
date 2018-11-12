@@ -111,22 +111,28 @@ function lowerOctave(tone){
 
 export default class PianoKeys {
   constructor() {
-    this.numberOfKeys = 48;
     this.state = {
+      numberOfKeys: 48,
       volume: [
           1, // Master volume
           0.5, // Mid Overtone volume
           0.25, // Lower Overtone volume
           0,
           0,
+          0,
+
         ],
       activeSynth: [],
-      lowerOvertones: [],
       midOvertones: [],
-      lowerlowerOvertones: [],
       midmidOvertones: [],
+      midmidmidOvertones: [],
+      lowerOvertones: [],
+      lowerlowerOvertones: [],
+      lowerlowerlowerOvertones: [],
       waveType: 'sawtooth',
+      currentLoaded: false,
     }
+    console.log(this.state);
     this.soundLevel = this.soundLevel.bind(this);
   }
 
@@ -140,9 +146,45 @@ export default class PianoKeys {
 
 */
 
-  initializeOscillators() {
-    this.state.activeSynth, this.state.lowerOvertones, this.state.midOvertones = [];
-    const skeletonVirtualSynth = new Array(this.numberOfKeys).fill(null); 
+  initializeOscillators(waveType) {
+    const keyCount = this.state.numberOfKeys;
+    const synthArray = [
+                        this.state.activeSynth, 
+                        this.state.lowerOvertones,
+                        this.state.lowerlowerOvertones,
+                        this.state.lowerlowerlowerOvertones,
+                        this.state.midOvertones,
+                        this.state.midmidOvertones,
+                        this.state.midmidmidOvertones, ]
+
+
+      synthArray.map((synArray,i) => {
+        for(let x = 0; x < keyCount; x++) {
+          let octaveNum = i%12;
+
+          if(this.state.currentLoaded) {
+            
+            synArray[x] = null;
+          }
+
+          synArray[x] = Synth(x,octaveNum, waveType);
+        }
+      })
+
+
+
+
+
+
+
+/*    this.state.activeSynth, 
+    this.state.lowerOvertones, 
+    this.state.midOvertones,
+    this.state.lowerlowerOvertones, 
+    this.state.midmidOvertones,
+    this.state.lowerlowerlowerOvertones, 
+    this.state.midmidmidOvertones  = [];
+    const skeletonVirtualSynth = new Array(this.state.numberOfKeys).fill(null); 
     const destination = context.destination;
 
     const virtualSynth = skeletonVirtualSynth.map((vKey,i) => {
@@ -150,19 +192,24 @@ export default class PianoKeys {
       this.state.activeSynth.push(Synth(i,octaveNum,this.state.waveType));
       this.state.midOvertones.push(Synth(i,octaveNum,this.state.waveType));
       this.state.lowerOvertones.push(Synth(i,octaveNum,this.state.waveType));
-      
+      this.state.midmidOvertones.push(Synth(i,octaveNum,this.state.waveType));
+      this.state.lowerlowerOvertones.push(Synth(i,octaveNum,this.state.waveType));
+      this.state.midmidmidOvertones.push(Synth(i,octaveNum,this.state.waveType));
+      this.state.lowerlowerlowerOvertones.push(Synth(i,octaveNum,this.state.waveType));
+            
     })
-    console.log(this.state);
+    console.log(this.state);*/
   }
 
   synthConsole() {
     let synthConsole = makeEle.createEle('div','synth_console',[12,12,12,12],'synthConsole');
     let speakersCount = Array(6).fill(null);
     let knobsCount = Array(5).fill(null);
-    let waveCount = Array(3).fill(null);
+    let waveCount = Array(5).fill(null);
     let speakersContainer = [];
     let knobsContainer = null;
     let knobTypes = ['attack','decay','sustain','release',];
+    let waveTypes = ['sine','square','triangle','sawtooth','custom'];
     let screenDisplay = null;
     let rightSide = null;
     let leftSide = null;
@@ -204,13 +251,23 @@ export default class PianoKeys {
       knobsContainer.append(renderKnob);
     })
 
+    let waveChoose = makeEle.createEle('div','wave_choose',null,'waveChoose');
 
+    waveCount.map((wave,i) => {
+      let renderWave = makeEle.createEle('div','wave_'+i,null,'wave');
+
+      renderWave.innerHTML = waveTypes[i];
+      renderWave.waveType = waveTypes[i];
+
+      waveChoose.append(renderWave);
+
+    })
 
     let volumeControl = makeEle.createEle('div','vol_control',null,'volumeControl');
     let volumeKnob = makeEle.createEle('input','vol_knob',null,'volumeKnob');
     volumeKnob.type = 'range';
     volumeKnob.min = 0;
-    volumeKnob.max = 75; // So you're not blasting your eardrums out. 
+    volumeKnob.max = 100; // So you're not blasting your eardrums out. 
 
     
     rightSide = makeEle.createEle('div','right_side',null,'rightSide');
@@ -218,11 +275,11 @@ export default class PianoKeys {
         
     volumeControl.append(volumeKnob);
 
-    leftSide.append(volumeControl);
+    leftSide.append(volumeControl, waveChoose);
 
 
     this.soundLevel(volumeControl);
-
+    this.changeWaveType(waveChoose);
 
     
     let mainConsole = makeEle.createEle('div','main_console',[12,12,12,12],'mainConsole');
@@ -237,7 +294,20 @@ export default class PianoKeys {
   }
 
 
+  changeWaveType(wavy) {
+    console.log(wavy.children);
 
+    for(let x=0; x<wavy.children.length; x++) {
+      let waveDiv = wavy.children[x];
+
+      waveDiv.addEventListener('click',(event) => {
+        console.log(event.target.waveType);
+        this.state.waveType = event.target.waveType;
+        this.state.currentLoaded = true;
+        this.initializeOscillators(this.state.waveType);
+      })
+    }
+  }
 
 
   soundOn() {
@@ -246,7 +316,7 @@ export default class PianoKeys {
     if(!event.metakey) {
       event.preventDefault();
     }
-    let noteKeys = this.numberOfKeys;
+    let noteKeys = this.state.numberOfKeys;
     let now = context.currentTime;
     let shifted = event.shiftKey ? true : false;
     let virtualKeys = [];
@@ -273,6 +343,8 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
             this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
             this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
+            this.state.midmidmidOvertones[notePosition].start(this.state.volume[5], now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].start(this.state.volume[6], now);
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.add('active_key');
@@ -282,6 +354,9 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
             this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
             this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
+            this.state.midmidmidOvertones[notePosition].start(this.state.volume[5], now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].start(this.state.volume[6], now);
+    
     }
           break;
         case note.kCode[1] :
@@ -293,6 +368,8 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
             this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
             this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
+            this.state.midmidmidOvertones[notePosition].start(this.state.volume[5], now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].start(this.state.volume[6], now);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.add('active_key');
@@ -302,6 +379,9 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
             this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
             this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
+            this.state.midmidmidOvertones[notePosition].start(this.state.volume[5], now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].start(this.state.volume[6], now);
+         
          }
           break;          
       }
@@ -324,7 +404,7 @@ export default class PianoKeys {
       event.preventDefault();
     }
     let now = context.currentTime.toFixed(2);
-    let noteKeys = this.numberOfKeys;
+    let noteKeys = this.state.numberOfKeys;
     let shifted = event.shiftKey ? true : false;
     let virtualKeys = [];
     for(let x=0; x<noteKeys; x++) {
@@ -356,6 +436,8 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].stop(0, now);
             this.state.midmidOvertones[notePosition].stop(0, now);
             this.state.lowerlowerOvertones[notePosition+4].stop(0, now);
+            this.state.midmidmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].stop(0, now);
 
 
           } else {
@@ -366,6 +448,9 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].stop(0, now);
             this.state.midmidOvertones[notePosition].stop(0, now);
             this.state.lowerlowerOvertones[notePosition+4].stop(0, now);            
+            this.state.midmidmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].stop(0, now);
+
           }
           break;
         case note.kCode[1] :
@@ -377,6 +462,8 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].stop(0, now);            
             this.state.midmidOvertones[notePosition].stop(0, now);
             this.state.lowerlowerOvertones[notePosition+4].stop(0, now);
+            this.state.midmidmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].stop(0, now);
 
           } else {
             virtualKeys[note.eventIndex[2]].classList.remove('active_key');
@@ -386,6 +473,9 @@ export default class PianoKeys {
             this.state.lowerOvertones[notePosition+7].stop(0, now);          
             this.state.midmidOvertones[notePosition].stop(0, now);
             this.state.lowerlowerOvertones[notePosition+4].stop(0, now);          
+            this.state.midmidmidOvertones[notePosition].stop(0, now);
+            this.state.lowerlowerlowerOvertones[notePosition+4].stop(0, now);
+
           }
           break;          
       }
@@ -398,7 +488,7 @@ export default class PianoKeys {
 
     let keyboardDisplay = makeEle.createEle('div','keyboard_display', [12,12,12,12],'keyboardDisplay');
 
-    let keyAmount = Array(this.numberOfKeys).fill(null); // Need to find the right amount for the right "flow" 
+    let keyAmount = Array(this.state.numberOfKeys).fill(null); // Need to find the right amount for the right "flow" 
     let key_container = makeEle.createEle('div','key_container',[12,12,12,12],'key_container');
     let whiteKeyContainer = makeEle.createEle('div','white_key_container',[12,12,12,12],['whiteKeyContainer','pianoKeysContainer']);
     let blackKeyContainer = makeEle.createEle('div','black_key_container',[12,12,12,12],['blackKeyContainer','pianoKeysContainer']);
@@ -456,11 +546,14 @@ export default class PianoKeys {
     vlControl.children[0].addEventListener('input', (event) => {
       console.log(vlControl.children[0].value);
       console.log((vlControl.children[0].value / 10));
-      this.state.volume[0] = (vlControl.children[0].value / 10);
-      this.state.volume[1] = (this.state.volume[0] / 2);
-      this.state.volume[2] = (this.state.volume[1] / 2);
-      this.state.volume[3] = (this.state.volume[2] / 2);
-      this.state.volume[4] = (this.state.volume[3] / 2);
+      this.state.volume[0] = (vlControl.children[0].value / 100) / 3;
+      this.state.volume[1] = (this.state.volume[0] / 2).toFixed(6);
+      this.state.volume[2] = (this.state.volume[1] / 2).toFixed(6);
+      this.state.volume[3] = (this.state.volume[2] / 2).toFixed(6);
+      this.state.volume[4] = (this.state.volume[3] / 2).toFixed(6);
+      this.state.volume[5] = (this.state.volume[4] / 2).toFixed(6);
+      this.state.volume[6] = (this.state.volume[5] / 2).toFixed(6);
+      console.log(this.state.volume);
     })
 
   }

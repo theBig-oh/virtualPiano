@@ -70,7 +70,9 @@
 
         .leftSide {
 
-          justify-content: space-evenly;
+          justify-content: center;
+          flex-direction: row;
+          flex-wrap: wrap;
 
           > div {
             border: 1px solid red; 
@@ -88,6 +90,20 @@
               position: relative; 
               left: 0%;
               width: 100%;
+            }
+          }
+
+          .waveChoose {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            height: 20%;
+            .wave {
+              width: 47%;
+              border: 1px solid yellow;
+              color: white;
+              margin: 1%;
             }
           }
         }

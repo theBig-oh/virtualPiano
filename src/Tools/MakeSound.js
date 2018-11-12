@@ -37,7 +37,7 @@
 import context from './audioContext.js';
 
 export default class MakeSound {
-  constructor(context, frequency, waveType) {
+  constructor(context, frequency, waveType, detune) {
     this.oscillator = context.createOscillator();
     this.gainNode = context.createGain();
     this.volume = this.gainNode.gain;
@@ -45,7 +45,6 @@ export default class MakeSound {
     this.oscillator.frequency.value = frequency;
     this.volume.value = 0;
 
-    console.log(this.oscillator);
     this.oscillator.connect(this.gainNode);
     this.gainNode.connect(context.destination);
 
