@@ -216,6 +216,7 @@ export default class PianoKeys {
     let leftSide = null;
   
     speakersCount.map((speaker,i) => {
+
       let typeOfSpeaker = null;
       let fans = null;
       
@@ -229,6 +230,7 @@ export default class PianoKeys {
 
       let speakr = makeEle.createEle('div','synth_speaker_'+i,[12,12,12,12],['speaker',typeOfSpeaker]);
             
+
       for(let x=0;x<=fans;x++) {
         let renderedFan = makeEle.createEle('div','speaker_'+i+'_fan_'+x,[12,12,12,12],['fans','speaker_'+i+'fans']);
 
@@ -285,6 +287,8 @@ export default class PianoKeys {
     
     let mainConsole = makeEle.createEle('div','main_console',[12,12,12,12],'mainConsole');
     
+
+
 
     mainConsole.append(leftSide ,screenDisplay, rightSide, knobsContainer);
     synthConsole.append(speakersContainer[0],mainConsole,speakersContainer[1]);
