@@ -317,6 +317,16 @@ export default class PianoKeys {
 
   soundOn() {
     const body = document.querySelector('body');
+    const playingSynth = [
+                          this.state.activeSynth,
+                          this.state.midOvertones,
+                          this.state.midmidOvertones,
+                          this.state.midmidmidOvertones,
+                          this.state.lowerOvertones,
+                          this.state.lowerlowerOvertones,
+                          this.state.lowerlowerlowerOvertones,
+                        ];
+
     body.addEventListener('keydown', (event) => {
     if(!event.metakey) {
       event.preventDefault();
@@ -332,8 +342,12 @@ export default class PianoKeys {
     Runs through the notes hash and checks the event key code. 
     If matches, then it will start the oscillator with the volume set. 
 
-*/
+    Going to have to write a loop that better deals with this 
+    cause it's ugly AF. 
+    
 
+*/
+    
     notes.map((note,i) => {
       let notePosition = 12;
       let midOvertone = 16;
@@ -343,13 +357,29 @@ export default class PianoKeys {
           if(shifted) {
             virtualKeys[note.eventIndex[0]].classList.add('active_key');
             notePosition = virtualKeys[note.eventIndex[0]].keyPosition;
+            midOvertone = notePosition + 4;
+            lowerOvertones = notePosition + 7; 
             this.state.activeSynth[notePosition].start(this.state.volume[0], now);
             this.state.midOvertones[notePosition+4].start(this.state.volume[1], now);
             this.state.lowerOvertones[notePosition+7].start(this.state.volume[2], now);
             this.state.midmidOvertones[notePosition].start(this.state.volume[3], now);
             this.state.lowerlowerOvertones[notePosition+4].start(this.state.volume[4], now);
-            this.state.midmidmidOvertones[notePosition].start(this.state.volume[5], now);
-            this.state.lowerlowerlowerOvertones[notePosition+4].start(this.state.volume[6], now);
+            this.state.midmidmidOvertones[notePosition+4].start(this.state.volume[5], now);
+            this.state.lowerlowerlowerOvertones[notePosition].start(this.state.volume[6], now);
+
+
+          /*  playingSynth.map((syn,x) => {
+              if(x%3==0 && x%2==0) {
+                syn[notePosition].start(this.state.volume[x],now);
+              } else if (x%3==0) {
+                console.log(x);
+              }
+            })
+*/
+
+
+
+
 
           } else {
             virtualKeys[note.eventIndex[1]].classList.add('active_key');
